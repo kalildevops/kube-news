@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kube-news
+  namespace: kube-news
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-news
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    # Allow HTTP from ALB (all sources — ALB terminates external traffic)
+    - ports:
+        - port: 8080
+          protocol: TCP
+    # Allow Prometheus scrape from DataDog agent
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: datadog
+      ports:
+        - port: 8080
+          protocol: TCP
+
+  egress:
+    # Allow DNS resolution
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow PostgreSQL to RDS (port 5432 only, no pod selector — RDS is external)
+    - ports:
+        - port: 5432
+          protocol: TCP
+    # Allow HTTPS for AWS SDK calls (Secrets Manager, SSM)
+    - ports:
+        - port: 443
+          protocol: TCP
+    # Allow DataDog APM agent communication
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: datadog
+      ports:
+        - port: 8126
+          protocol: TCP

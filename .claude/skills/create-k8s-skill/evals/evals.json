@@ -1,0 +1,23 @@
+{
+  "skill_name": "create-k8s-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tenho uma API Node.js com Express na porta 3000 que usa PostgreSQL. Quero criar toda a estrutura Kubernetes com Kustomize para rodar num cluster na DigitalOcean. A aplicação já tem endpoint /health.",
+      "expected_output": "Estrutura Kustomize completa: base com deployment, service, hpa, networkpolicy, namespace + overlay digitalocean com Secret simples, PostgreSQL in-cluster com PGDATA corrigido, patch de service sem anotações AWS.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Preciso criar um Helm chart para minha aplicação Python/FastAPI que roda na porta 8000 e conecta num banco PostgreSQL gerenciado. Não quero subir banco no cluster, só a aplicação.",
+      "expected_output": "Helm chart com Chart.yaml, values.yaml, _helpers.tpl, namespace.yaml, deployment.yaml, service.yaml, secret.yaml, hpa.yaml, networkpolicy.yaml. Sem postgres.yaml. Namespace dedicado com o nome da aplicação.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Fiz o deploy de uma aplicação no cluster com kubectl apply -k mas o pod está com ImagePullBackOff. Estou usando Mac M2 e o cluster é EKS na AWS.",
+      "expected_output": "Diagnóstico: imagem provavelmente buildada apenas para arm64. Solução: docker buildx build --platform linux/amd64,linux/arm64. Também verifica se o registry está acessível e se imagePullPolicy está correto.",
+      "files": []
+    }
+  ]
+}

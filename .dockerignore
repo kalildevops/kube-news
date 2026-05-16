@@ -1,0 +1,12 @@
+.git
+.github
+*.md
+terraform/
+k8s/
+src/node_modules
+.env
+.env.*
+*.log
+*.http
+.claude/
+skills-lock.json
