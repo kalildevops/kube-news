@@ -111,11 +111,11 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER }} --region ${{ env.AWS_REGION }}
 
-      - name: Deploy to EKS
+      - name: Deploy to EKS (kustomize)
         run: |
-          kubectl set image deployment/kube-news \
-            kube-news=${{ needs.build-and-push.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image-tag }} \
-            -n ${{ env.K8S_NAMESPACE }}
+          cd k8s/overlays/qa
+          kustomize edit set image kube-news=${{ needs.build-and-push.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image-tag }}
+          kubectl apply -k .
           kubectl rollout status deployment/kube-news -n ${{ env.K8S_NAMESPACE }} --timeout=180s
 
       - name: Smoke test

@@ -5,6 +5,18 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
   backend "s3" {
     bucket         = "kube-news-tfstate-prod"
@@ -31,8 +43,8 @@ module "vpc" {
   environment = "prod"
   cidr        = var.vpc_cidr
 
-  enable_nat_gateway      = true
-  single_nat_gateway      = false  # one per AZ for HA
+  enable_nat_gateway = true
+  single_nat_gateway = false  # one NAT per AZ for HA
 }
 
 module "eks" {
@@ -53,11 +65,22 @@ module "rds" {
   vpc_id      = module.vpc.vpc_id
   subnet_ids  = module.vpc.private_subnet_ids
 
-  # Aurora Serverless v2 for prod — auto-scales, Multi-AZ native
-  engine              = "aurora-postgresql"
-  instance_class      = "db.serverless"
-  multi_az            = true
-  db_name             = "kubedevnews"
-  use_secrets_manager = true
-  secrets_path        = "/kube-news/prod/db"
+  allowed_security_group_id = module.eks.node_security_group_id
+  engine                    = "aurora-postgresql"
+  instance_class            = "db.serverless"
+  multi_az                  = true
+  db_name                   = "kubedevnews"
+  use_secrets_manager       = true
+  secrets_path              = "/kube-news/prod/db"
+}
+
+module "datadog" {
+  source      = "../../modules/datadog"
+  environment = "prod"
+
+  cluster_name      = module.eks.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  cluster_ca        = module.eks.cluster_ca
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
 }
