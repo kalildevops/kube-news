@@ -2,7 +2,11 @@
 .github
 *.md
 terraform/
-node_modules
+k8s/
+src/node_modules
 .env
 .env.*
 *.log
+*.http
+.claude/
+skills-lock.json

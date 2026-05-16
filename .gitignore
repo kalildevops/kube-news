@@ -104,3 +104,7 @@ node_modules/
 # .tern-port
 
 *.Identifier
+
+# Secrets — nunca commitar credenciais
+values-secrets.yaml
+**/secret.yaml

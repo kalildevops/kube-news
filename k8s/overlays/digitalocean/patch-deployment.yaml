@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-news
+  namespace: kube-news
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: kube-news
+          env:
+            - name: DB_SSL_REQUIRE
+              value: "false"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
